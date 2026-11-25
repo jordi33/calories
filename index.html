@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Calories</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+  <style>
+    :root {
+      --bg: #eaf0ed;
+      --card: #fff;
+      --ink: #12241e;
+      --mute: #5d6f68;
+      --line: #cfdad5;
+      --acc: #1b6b57;
+      --acc2: #e0561b;
+      --on: #fff;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      color-scheme: light
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0f1815;
+        --card: #18251f;
+        --ink: #e6f0ec;
+        --mute: #93a79f;
+        --line: #2b3d35;
+        --acc: #4fc3a1;
+        --acc2: #ff8a54;
+        --on: #08110e;
+        color-scheme: dark
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0f1815;
+      --card: #18251f;
+      --ink: #e6f0ec;
+      --mute: #93a79f;
+      --line: #2b3d35;
+      --acc: #4fc3a1;
+      --acc2: #ff8a54;
+      --on: #08110e;
+      color-scheme: dark
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 400 16px/1.4 "Bricolage Grotesque", system-ui, -apple-system, sans-serif
+    }
+
+    main {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px 16px 40px
+    }
+
+    h2 {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 10px;
+      color: var(--mute)
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      border-radius: 99px;
+      padding: 8px 16px;
+      font: inherit;
+      font-weight: 600
+    }
+
+    .chip.on {
+      background: var(--acc);
+      color: var(--on);
+      border-color: var(--acc)
+    }
+
+    input {
+      font: inherit;
+      font-size: 16px;
+      color: var(--ink);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      min-width: 0;
+      width: 100%
+    }
+
+    input:focus,
+    button:focus-visible {
+      outline: 2px solid var(--acc);
+      outline-offset: 1px
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px
+    }
+
+    .btn {
+      border: 0;
+      background: var(--acc);
+      color: var(--on);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font: inherit;
+      font-weight: 600;
+      white-space: nowrap
+    }
+
+    .ghost {
+      background: none;
+      border: 1px solid var(--line);
+      color: var(--ink)
+    }
+
+    .big {
+      font-size: 44px;
+      font-weight: 800;
+      line-height: 1
+    }
+
+    .mute {
+      color: var(--mute);
+      font-size: 14px
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-top: 1px solid var(--line)
+    }
+
+    .item button {
+      background: none;
+      border: 0;
+      color: var(--mute);
+      font-size: 20px;
+      padding: 0 6px
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px
+    }
+
+    .nav button {
+      width: 40px
+    }
+
+    .bar {
+      height: 8px;
+      background: var(--line);
+      border-radius: 4px;
+      margin: 10px 0 4px;
+      overflow: hidden
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      background: var(--acc)
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block
+    }
+
+    svg text {
+      fill: var(--mute);
+      font: 11px "Bricolage Grotesque", system-ui, sans-serif
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+      margin-top: 8px
+    }
+
+    .stats b {
+      display: block;
+      font-size: 22px
+    }
+  </style>
+</head>
+
+<body>
+  <main id="app"></main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script>
+    var SUPABASE_URL = "https://hpszkzskrewbxjizzmww.supabase.co", SUPABASE_KEY = "sb_publishable_AOEmbT94pGWeM4egheDYZw_BlU4AGjB";
+    function makeDB() {
+      var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      return {
+        doc: function (path) {
+          var a = path.split("/"), t = a[0], id = a[1]; return {
+            set: async function (x) { var r = await sb.from(t).upsert(Object.assign({ id: id }, x)); if (r.error) throw r.error },
+            delete: async function () { var r = await sb.from(t).delete().eq("id", id); if (r.error) throw r.error }
+          }
+        },
+        collection: function (t) {
+          return {
+            onSnapshot: function (ok, bad) {
+              function load() { sb.from(t).select("*").then(function (r) { if (r.error) { if (bad) bad(r.error); return } ok({ docs: r.data.map(function (row) { return { id: row.id, data: function () { return row } } }) }) }) }
+              load(); sb.channel("rt_" + t).on("postgres_changes", { event: "*", schema: "public", table: t }, load).subscribe()
+            }
+          }
+        }
+      }
+    }
+    var DB = null, PR = [], DY = {}, loaded = 0, cur = null, week = null, day = null, panel = false, delArm = false, msg = '';
+    try { cur = localStorage.getItem('cal_cur') } catch (e) { }
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) }
+    function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') }
+    function pd(s) { var a = s.split('-'); return new Date(+a[0], a[1] - 1, +a[2]) }
+    function addD(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x }
+    function mon(d) { var x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x }
+    day = iso(new Date()); week = mon(new Date());
+    function $(i) { return document.getElementById(i) }
+    function P() { return PR.filter(function (p) { return p.id === cur })[0] || PR[0] }
+    function gd(date) { return DY[P().id + '_' + date] || { items: [], w: null } }
+    function tot(date) { return gd(date).items.reduce(function (a, e) { return a + e.k }, 0) }
+    function avgWeek(ws) { var s = 0, n = 0; for (var i = 0; i < 7; i++) { var t = tot(iso(addD(ws, i))); if (t > 0) { s += t; n++ } } return n ? Math.round(s / n) : null }
+    function avgW(ws) { var s = 0, n = 0; for (var i = 0; i < 7; i++) { var w = gd(iso(addD(ws, i))).w; if (w) { s += w; n++ } } return n ? s / n : null }
+    function bars(vals, labels, goal) {
+      var W = 320, H = 150, b = 22, mx = Math.max.apply(null, vals.concat([goal || 0, 1])) * 1.15, n = vals.length, g = W / n, o = '<svg viewBox="0 0 ' + W + ' ' + (H + 22) + '">';
+      vals.forEach(function (v, i) {
+        var h = v ? v / mx * H : 3, x = i * g + (g - b) / 2;
+        o += '<rect x="' + x + '" y="' + (H - h) + '" width="' + b + '" height="' + h + '" rx="4" fill="' + (v ? 'var(--acc)' : 'var(--line)') + '"/>';
+        if (v) o += '<text x="' + (x + b / 2) + '" y="' + (H - h - 4) + '" text-anchor="middle">' + v + '</text>';
+        o += '<text x="' + (x + b / 2) + '" y="' + (H + 16) + '" text-anchor="middle">' + labels[i] + '</text>'
+      });
+      if (goal) { var y = H - goal / mx * H; o += '<line x1="0" x2="' + W + '" y1="' + y + '" y2="' + y + '" stroke="var(--acc2)" stroke-dasharray="4 4"/>' }
+      return o + '</svg>'
+    }
+    function line(vals, labels) {
+      var pts = vals.filter(function (v) { return v != null }); if (!pts.length) return '<p class="mute">Ajoute ton poids pour voir la courbe.</p>';
+      var W = 320, H = 120, mn = Math.min.apply(null, pts) - 1, mx = Math.max.apply(null, pts) + 1, n = vals.length, g = W / n, o = '<svg viewBox="0 0 ' + W + ' ' + (H + 22) + '">', d = '', last = null;
+      vals.forEach(function (v, i) {
+        var x = i * g + g / 2;
+        if (v != null) {
+          var y = H - (v - mn) / (mx - mn) * H; d += (last == null ? 'M' : 'L') + x + ' ' + y; last = v;
+          o += '<circle cx="' + x + '" cy="' + y + '" r="4" fill="var(--acc)"/><text x="' + x + '" y="' + (y - 9) + '" text-anchor="middle">' + v.toFixed(1) + '</text>'
+        }
+        o += '<text x="' + x + '" y="' + (H + 16) + '" text-anchor="middle">' + labels[i] + '</text>'
+      });
+      return o + '<path d="' + d + '" fill="none" stroke="var(--acc)" stroke-width="2"/></svg>'
+    }
+    function fmt(d) { return d.getDate() + '/' + (d.getMonth() + 1) }
+    function render() {
+      var keep = {};['lab', 'kc', 'pname', 'wt'].forEach(function (i) { var e = $(i); if (e) keep[i] = [e.value, document.activeElement === e] });
+      var A = $('app');
+      if (!DB) { A.innerHTML = '<div class="card">' + (msg || 'Connexion à la base…') + '</div>'; return }
+      if (loaded < 3) { A.innerHTML = '<div class="card">Chargement…</div>'; return }
+      if (!PR.length) { A.innerHTML = '<div class="card"><h2>Crée le premier profil</h2><div class="row"><input id="pname" placeholder="Prénom"><button class="btn" onclick="addP()">Créer</button></div></div>'; return }
+      var p = P(), g = gd(day), list = g.items, t = tot(day), pct = Math.min(100, t / p.goal * 100);
+      var h = '<div class="chips">' + PR.map(function (x) { return '<button class="chip' + (x.id === p.id ? ' on' : '') + '" onclick="pick(\'' + x.id + '\')">' + esc(x.name) + '</button>' }).join('') + '<button class="chip" onclick="panel=!panel;render()" aria-label="Réglages">⚙</button></div>';
+      if (panel) h += '<div class="card"><h2>Objectif de ' + esc(p.name) + '</h2><div class="row"><input id="goal" type="number" inputmode="numeric" value="' + p.goal + '"><button class="btn" onclick="setGoal()">Enregistrer</button></div>'
+        + '<h2 style="margin-top:14px">Nouveau profil</h2><div class="row"><input id="pname" placeholder="Prénom"><button class="btn" onclick="addP()">Ajouter</button></div>'
+        + (PR.length > 1 ? '<button class="btn ghost" onclick="delP()">' + (delArm ? 'Confirmer la suppression de ' + esc(p.name) : 'Supprimer ce profil') + '</button>' : '') + '</div>';
+      h += '<div class="card"><div class="nav"><button class="btn ghost" onclick="mv(-1)" aria-label="Jour précédent">‹</button><input type="date" id="dt" value="' + day + '" onchange="day=this.value||day;render()" style="width:auto"><button class="btn ghost" onclick="mv(1)" aria-label="Jour suivant">›</button></div>'
+        + '<div class="big">' + t + ' <span class="mute">/ ' + p.goal + ' kcal</span></div><div class="bar"><i style="width:' + pct + '%"></i></div>'
+        + '<div class="mute">' + (t > p.goal ? (t - p.goal) + ' kcal au-dessus' : (p.goal - t) + ' kcal restantes') + '</div></div>';
+      h += '<div class="card"><h2>Ajouter</h2><div class="row"><input id="lab" placeholder="Repas (facultatif)"><input id="kc" type="number" inputmode="numeric" placeholder="kcal" style="width:90px"></div><button class="btn ghost" style="width:100%;margin-bottom:8px" onclick="document.getElementById(\'ph\').click()">📷 Estimer sur photo</button><input id="ph" type="file" accept="image/*" hidden onchange="photo(this.files[0]);this.value=\'\'"><div class="mute" style="margin-bottom:8px">' + hint + '</div><button class="btn" style="width:100%" onclick="add()">Ajouter</button>'
+        + list.map(function (e, i) { return '<div class="item"><span>' + esc(e.l || 'Repas') + '</span><span><b>' + e.k + '</b> kcal<button onclick="rm(' + i + ')" aria-label="Supprimer">×</button></span></div>' }).join('') + '</div>';
+      h += '<div class="card"><h2>Poids du jour (kg)</h2><div class="row"><input id="wt" type="number" step="0.1" inputmode="decimal" value="' + (g.w || '') + '" placeholder="ex. 72.4"><button class="btn" onclick="setW()">Enregistrer</button></div></div>';
+      var labs = [], vals = []; for (var i = 0; i < 7; i++) { labs.push('LMMJVSD'[i]); vals.push(tot(iso(addD(week, i)))) }
+      var a = avgWeek(week), aw = avgW(week);
+      h += '<div class="card"><div class="nav"><button class="btn ghost" onclick="wk(-1)" aria-label="Semaine précédente">‹</button><b>Semaine du ' + fmt(week) + '</b><button class="btn ghost" onclick="wk(1)" aria-label="Semaine suivante">›</button></div>' + bars(vals, labs, p.goal)
+        + '<div class="stats"><div><b>' + (a == null ? '–' : a) + '</b><span class="mute">moyenne kcal/jour</span></div><div><b>' + (aw == null ? '–' : aw.toFixed(1)) + '</b><span class="mute">poids moyen kg</span></div></div></div>';
+      var cw = mon(new Date()), av = [], wv = [], wl = [];
+      for (var j = 7; j >= 0; j--) { var s = addD(cw, -7 * j); av.push(avgWeek(s) || 0); wv.push(avgW(s)); wl.push(fmt(s)) }
+      h += '<div class="card"><h2>Moyenne kcal par semaine</h2>' + bars(av, wl, p.goal) + '</div><div class="card"><h2>Poids moyen par semaine</h2>' + line(wv, wl) + '</div>';
+      A.innerHTML = h;
+      Object.keys(keep).forEach(function (i) { var e = $(i); if (e && keep[i][0]) { e.value = keep[i][0] } if (e && keep[i][1]) e.focus() })
+    }
+    function pick(id) { cur = id; delArm = false; try { localStorage.setItem('cal_cur', id) } catch (e) { } render() }
+    function mv(n) { day = iso(addD(pd(day), n)); render() }
+    function wk(n) { week = addD(week, 7 * n); render() }
+    function wr(p) { return p.catch(function (e) { msg = 'Écriture impossible, vérifie la connexion et la configuration Supabase.'; alert(msg) }) }
+    function saveDay(items, w) { var pid = P().id; wr(DB.doc('days/' + pid + '_' + day).set({ pid: pid, date: day, items: items, w: w || null })) }
+    function add() { var k = parseInt($('kc').value, 10); if (!(k > 0)) return; var g = gd(day); $('kc').value = ''; var l = $('lab').value.trim(); $('lab').value = ''; saveDay(g.items.concat([{ l: l, k: k }]), g.w) }
+    var hint = '';
+    async function photo(f) {
+      if (!f) return; hint = 'Analyse de la photo…'; render();
+      try {
+        var bm = await createImageBitmap(f), r = Math.min(1, 1024 / Math.max(bm.width, bm.height)), c = document.createElement('canvas');
+        c.width = Math.round(bm.width * r); c.height = Math.round(bm.height * r); c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height);
+        var rs = await fetch('/api/estimate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: c.toDataURL('image/jpeg', 0.8).split(',')[1] }) });
+        var o = await rs.json(); if (!rs.ok) throw new Error(o.error || 'erreur');
+        hint = 'Estimation : ' + o.min + '–' + o.max + ' kcal. Vérifie et ajuste avant d’ajouter.'; render();
+        $('lab').value = o.nom || ''; $('kc').value = Math.round((o.min + o.max) / 2);
+      } catch (e) { hint = 'Estimation impossible (' + ((e && e.code) || 'erreur') + ').'; render() }
+    }
+    function rm(i) { var g = gd(day), it = g.items.slice(); it.splice(i, 1); saveDay(it, g.w) }
+    function setW() { var v = parseFloat($('wt').value); saveDay(gd(day).items, v > 0 ? v : null) }
+    function setGoal() { var v = parseInt($('goal').value, 10); if (v > 0) wr(DB.doc('profiles/' + P().id).set({ name: P().name, goal: v })) }
+    function addP() { var n = $('pname').value.trim(); if (!n) return; var id = 'p' + Date.now(); cur = id; panel = false; wr(DB.doc('profiles/' + id).set({ name: n, goal: 2500 })) }
+    function delP() { if (!delArm) { delArm = true; render(); return } var id = P().id; delArm = false; panel = false; cur = null; wr(DB.doc('profiles/' + id).delete()) }
+    render();
+    setTimeout(function () { if (loaded < 3 && DB) { msg = 'Impossible de joindre la base pour le moment.'; DB = null; render() } }, 10000);
+    (async function () {
+      try { DB = makeDB() } catch (e) { DB = null }
+      if (!DB) { msg = 'Ouvre cette page depuis le lien Claude, en étant connecté à ton compte.'; render(); return }
+      render();
+      DB.collection('profiles').onSnapshot(function (s) { PR = s.docs.map(function (d) { var x = d.data(); return { id: d.id, name: x.name, goal: x.goal || 2500 } }); loaded |= 1; render() }, function () { msg = 'Erreur de lecture.'; DB = null; render() });
+      DB.collection('days').onSnapshot(function (s) { DY = {}; s.docs.forEach(function (d) { DY[d.id] = d.data() }); loaded |= 2; render() }, function () { });
+    })();
+  </script>
+</body>
+
+</html>
